@@ -5,6 +5,9 @@ on:
 #    branches:
 #      - develop
 
+env:
+  NODE_VERSION: '10.x'   # Node 10 LTS
+
 jobs:
   pack:
     runs-on: ubuntu-latest
