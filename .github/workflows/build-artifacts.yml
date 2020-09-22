@@ -29,7 +29,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: Documentation
-          path: docs2/build/public/**
+          path: docs2/public/**
           if-no-files-found: error
       - name: Use .NET Core 3.1 SDK
         uses: actions/setup-dotnet@v1
