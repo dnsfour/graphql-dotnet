@@ -24,14 +24,13 @@ jobs:
         run: yarn
       - name: yarn gatsby build
         working-directory: docs2
-        run: |
-          yarn gatsby build
-          ls -R
+        run: yarn gatsby build
       - name: Publish docs artifacts
         uses: actions/upload-artifact@v2
         with:
           name: Documentation
-          path: docs2/build/**
+          path: docs2/build/public/**
+          if-no-files-found: error
       - name: Use .NET Core 3.1 SDK
         uses: actions/setup-dotnet@v1
         with:
@@ -49,8 +48,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: Nuget packages
-          path: |
-            src/out/*.nupkg
+          path: src/out/*.nupkg
 #      - name: Publish Nuget packages to GitHub registry
 #        working-directory: src
 #        run: dotnet nuget push out/*.nupkg -s "myget-graphql-dotnet" -k ${{ secrets.GITHUB_TOKEN }}
