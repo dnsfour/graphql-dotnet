@@ -2,8 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using GraphQL.DataLoader;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -12,6 +14,8 @@ namespace GraphQL
 {
     public static class TypeExtensions
     {
+        internal static readonly Type[] taskTypes = new[] { typeof(Task<>), typeof(ValueTask<>) };
+
         /// <summary>
         /// Conditionally casts the item into the indicated type using an "as" cast.
         /// </summary>
@@ -94,6 +98,8 @@ namespace GraphQL
                 : typeName;
         }
 
+        
+
         /// <summary>
         /// Gets the graph type for the indicated type.
         /// </summary>
@@ -104,6 +110,12 @@ namespace GraphQL
         public static Type GetGraphTypeFromType(this Type type, bool isNullable = false)
         {
             while (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDataLoaderResult<>))
+            {
+                type = type.GetGenericArguments()[0];
+            }
+
+            
+            while (type.IsGenericType && taskTypes.Contains(type.GetGenericTypeDefinition()))
             {
                 type = type.GetGenericArguments()[0];
             }
@@ -241,5 +253,21 @@ namespace GraphQL
         public static string Description(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description ?? memberInfo.GetXmlDocumentation();
 
         public static string ObsoleteMessage(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message;
+
+        internal static bool GraphTypeIsNullable(this PropertyInfo propertyInfo) => !Attribute.IsDefined(propertyInfo, typeof(RequiredAttribute)) && GraphTypeIsNullable(propertyInfo.PropertyType);
+        internal static bool GraphTypeIsNullable(this ParameterInfo parameterInfo) => !Attribute.IsDefined(parameterInfo, typeof(RequiredAttribute)) && GraphTypeIsNullable(parameterInfo.ParameterType);
+        internal static bool GraphTypeIsNullable(this MethodInfo methodInfo) => GraphTypeIsNullable(methodInfo.ReturnType);
+
+        internal static bool GraphTypeIsNullable(this Type type)
+        {
+            if (type.IsGenericType && taskTypes.Contains(type.GetGenericTypeDefinition()))
+                return GraphTypeIsNullable(type.GetGenericArguments()[0]);
+
+            if (!type.IsValueType)
+                return true;
+
+            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+        }
+
     }
 }
