@@ -14,7 +14,11 @@ namespace GraphQL
 {
     public static class TypeExtensions
     {
-        internal static readonly Type[] taskTypes = new[] { typeof(Task<>), typeof(ValueTask<>) };
+        internal static readonly Type[] taskTypes = new[] {
+            typeof(Task<>),
+            // todo: strategies don't supported ValueTask
+            //typeof(ValueTask<>) 
+        };
 
         /// <summary>
         /// Conditionally casts the item into the indicated type using an "as" cast.
@@ -35,7 +39,8 @@ namespace GraphQL
         /// </returns>
         public static bool IsConcrete(this Type type)
         {
-            if (type == null) return false;
+            if (type == null)
+                return false;
 
             return !type.IsAbstract && !type.IsInterface;
         }
@@ -98,7 +103,7 @@ namespace GraphQL
                 : typeName;
         }
 
-        
+
 
         /// <summary>
         /// Gets the graph type for the indicated type.
@@ -114,7 +119,7 @@ namespace GraphQL
                 type = type.GetGenericArguments()[0];
             }
 
-            
+
             while (type.IsGenericType && taskTypes.Contains(type.GetGenericTypeDefinition()))
             {
                 type = type.GetGenericArguments()[0];
@@ -203,7 +208,8 @@ namespace GraphQL
 
         public static Type GetEnumerableElementType(this Type type)
         {
-            if (_untypedContainers.Contains(type)) return typeof(object);
+            if (_untypedContainers.Contains(type))
+                return typeof(object);
 
             if (type.IsConstructedGenericType)
             {

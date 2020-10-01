@@ -61,7 +61,6 @@ namespace GraphQL.Tests.Types
             public int someNotNullInt { get; set; }
             public Money someMoney { get; set; }
             public Task<Money> someTaskMoneyMethod() => default;
-            public ValueTask<Money> someValueTaskMoneyMethod() => default;
             public Money someMoneyMethod() => default;
             public int someIntMethod1(IResolveFieldContext ctx, int a, int b) => default;
             public int someIntMethod2(int a, IResolveFieldContext ctx, int b) => default;
@@ -118,7 +117,6 @@ namespace GraphQL.Tests.Types
             type.Fields.First(f => f.Name == nameof(TestObject.someRequiredListWithNullable)).Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<IntGraphType>>));
             type.Fields.First(f => f.Name == nameof(TestObject.someMoney)).Type.ShouldBe(typeof(AutoRegisteringObjectGraphType<Money>));
             type.Fields.First(f => f.Name == nameof(TestObject.someTaskMoneyMethod)).Type.ShouldBe(typeof(AutoRegisteringObjectGraphType<Money>));
-            type.Fields.First(f => f.Name == nameof(TestObject.someValueTaskMoneyMethod)).Type.ShouldBe(typeof(AutoRegisteringObjectGraphType<Money>));
             type.Fields.First(f => f.Name == nameof(TestObject.someMoneyMethod)).Type.ShouldBe(typeof(AutoRegisteringObjectGraphType<Money>));
             type.Fields.First(f => f.Name == nameof(TestObject.someIntMethod1)).Type.ShouldBe(typeof(NonNullGraphType<IntGraphType>));
             type.Fields.First(f => f.Name == nameof(TestObject.someIntMethod3)).Type.ShouldBe(typeof(IntGraphType));
